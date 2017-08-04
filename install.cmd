@@ -80,6 +80,7 @@ REM Change the Authentication setting to Basic Authentication
 %APPCMD% set config "%SITE_NAME%/%SITE_PATH%" /section:windowsAuthentication /enabled:"False" /commit:APPHOST
 
 REM Add a handler mapping
+%APPCMD% set config "%SITE_NAME%/%SITE_PATH%" -section:system.webServer/handlers /overrideMode:Allow /commit:APPHOST
 %APPCMD% set config "%SITE_NAME%/%SITE_PATH%" -section:system.webServer/handlers /+"[name='F5 IsHandler',path='F5Isapi.dll',verb='*',type='F5.IsHandler',preCondition='']"
 
 GOTO EOF
