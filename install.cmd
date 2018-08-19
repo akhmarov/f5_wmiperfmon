@@ -175,7 +175,7 @@ REM Set only Basic Authentication for previous application
 
 REM Create a new handler mapping for created application
 %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" -section:system.webServer/handlers /overrideMode:Allow /commit:APPHOST
-%OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" -section:system.webServer/handlers /+"[name='F5 IsHandler',path='F5Isapi.dll',verb='*',type='F5.IsHandler',preCondition='']"
+%OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" -section:system.webServer/handlers /+"[name='F5 IsHandler',path='%IIS_SITE_PATH%/F5Isapi.dll',verb='POST',type='F5.IsHandler',preCondition='']"
 
 EXIT /B
 
