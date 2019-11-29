@@ -188,10 +188,12 @@ REM #
 REM # Configures IIS 7.0 / 7.5 / 8.0 / 8.5 and newer
 REM #
 
-REM Remove old application and application pool
-%OS_APPCMD% list app /name:"%IIS_SITE_NAME%/%IIS_SITE_PATH%" >nul 2>&1
+REM Check for old application and application pool
+%OS_APPCMD% list app "%IIS_SITE_NAME%/%IIS_SITE_PATH%" >nul 2>&1
 IF "%ERRORLEVEL%"=="0" (
-	%OS_APPCMD% delete app "%IIS_SITE_NAME%/%IIS_SITE_PATH%"
+	ECHO "ERROR: You need to manually remove app %IIS_SITE_NAME%/%IIS_SITE_PATH% using IIS Manager"
+	PAUSE
+	GOTO L_EOF
 )
 %OS_APPCMD% list apppool /name:"%IIS_POOL_NAME%" >nul 2>&1
 IF "%ERRORLEVEL%"=="0" (
@@ -200,6 +202,7 @@ IF "%ERRORLEVEL%"=="0" (
 
 REM Create a new application pool
 %OS_APPCMD% add apppool /name:"%IIS_POOL_NAME%"
+%OS_APPCMD% set apppool /apppool.name:"%IIS_POOL_NAME%" /managedRuntimeVersion:"v4.0"
 %OS_APPCMD% set apppool /apppool.name:"%IIS_POOL_NAME%" /processModel.identityType:NetworkService
 
 REM Create a new application for created application pool
@@ -213,6 +216,8 @@ REM Set only Basic Authentication for created application
 REM %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:anonymousAuthentication /overrideMode:Allow /commit:APPHOST
 REM %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:basicAuthentication /overrideMode:Allow /commit:APPHOST
 REM %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:windowsAuthentication /overrideMode:Allow /commit:APPHOST
+REM %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:system.web/authentication /mode:Windows /commit:APPHOST
+%OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:system.web/authentication /mode:None /commit:WEBROOT
 %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:anonymousAuthentication /enabled:"False" /commit:APPHOST
 %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:basicAuthentication /enabled:"True" /commit:APPHOST
 %OS_APPCMD% set config "%IIS_SITE_NAME%/%IIS_SITE_PATH%" /section:windowsAuthentication /enabled:"False" /commit:APPHOST
@@ -241,7 +246,7 @@ REM #
 REM # Installs required IIS features
 REM #
 
-%OS_DISM% /Online /Enable-Feature /FeatureName:IIS-BasicAuthentication /FeatureName:IIS-ISAPIExtensions /FeatureName:IIS-URLAuthorization >nul
+%OS_DISM% /Online /Enable-Feature /FeatureName:IIS-BasicAuthentication /FeatureName:IIS-ISAPIExtensions /FeatureName:IIS-URLAuthorization /FeatureName:Web-Asp-Net45 >nul
 
 EXIT /B
 
